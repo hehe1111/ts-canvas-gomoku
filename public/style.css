@@ -6,12 +6,17 @@
   box-sizing: border-box;
 }
 
-.page {
-  display: flex;
-  align-items: center;
+.header {
+  text-align: center;
 }
 
 .container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.canvas-container {
   margin: 10px;
   padding: 10px;
   background-color: #dabb4f;
@@ -20,5 +25,5 @@
 }
 
 #result {
-  margin-left: 40px;
+  margin-left: 10px;
 }
