@@ -1,9 +1,9 @@
 "use strict";
 
 var BOARD_AREA_SIZE = 540;
-var COLUMNS = 18; // 设置网格大小
+var LINES = 19; // 设置网格大小
 
-var GRID_SIZE = BOARD_AREA_SIZE / COLUMNS;
+var GRID_SIZE = BOARD_AREA_SIZE / (LINES - 1);
 var OFFSET = GRID_SIZE / 2;
 var goGoard = document.getElementById('canvas');
 goGoard.width = BOARD_AREA_SIZE + OFFSET * 2;
@@ -12,10 +12,10 @@ var ctx = goGoard.getContext('2d');
 var me = true;
 var occupied = [];
 
-for (var i = 0; i < COLUMNS + 1; i++) {
+for (var i = 0; i < LINES; i++) {
   occupied[i] = [];
 
-  for (var j = 0; j < COLUMNS + 1; j++) {
+  for (var j = 0; j < LINES; j++) {
     occupied[i][j] = 0;
   }
 }
@@ -26,7 +26,7 @@ goGoard.addEventListener('click', onClickGoBoard);
 
 function drawGoBoard() {
   // 绘制 x、y 轴线
-  for (var _i = 0; _i < COLUMNS + 1; _i++) {
+  for (var _i = 0; _i < LINES; _i++) {
     ctx.beginPath();
     ctx.moveTo(OFFSET, toLength(_i) - 0.5); // - 0.5 是为了解决像素模糊问题
 
@@ -35,7 +35,7 @@ function drawGoBoard() {
     ctx.closePath();
   }
 
-  for (var _j = 0; _j < COLUMNS + 1; _j++) {
+  for (var _j = 0; _j < LINES; _j++) {
     ctx.beginPath();
     ctx.moveTo(toLength(_j) - 0.5, OFFSET);
     ctx.lineTo(toLength(_j) - 0.5, BOARD_AREA_SIZE + OFFSET);
@@ -44,7 +44,8 @@ function drawGoBoard() {
   } // 绘制星元、天元
 
 
-  COLUMNS % 6 === 0 && [1 / 6, 1 / 2, 5 / 6].map(function (x) {
+  ;
+  (LINES - 1) % 6 === 0 && [1 / 6, 1 / 2, 5 / 6].map(function (x) {
     ;
     [1 / 6, 1 / 2, 5 / 6].map(function (y) {
       ctx.beginPath();
