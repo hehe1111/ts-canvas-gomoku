@@ -4,12 +4,22 @@ const COLUMNS = 18
 const GRID_SIZE = BOARD_AREA_SIZE / COLUMNS
 const OFFSET = GRID_SIZE / 2
 
-const canvas = document.getElementById('canvas')! as HTMLCanvasElement
-canvas.width = BOARD_AREA_SIZE + OFFSET * 2
-canvas.height = BOARD_AREA_SIZE + OFFSET * 2
-const ctx = canvas.getContext('2d')!
+const goGoard = document.getElementById('canvas')! as HTMLCanvasElement
+goGoard.width = BOARD_AREA_SIZE + OFFSET * 2
+goGoard.height = BOARD_AREA_SIZE + OFFSET * 2
+const ctx = goGoard.getContext('2d')!
+
+let me: boolean = true
+const occupied: number[][] = []
+for (let i = 0; i < COLUMNS + 1; i++) {
+  occupied[i] = []
+  for (let j = 0; j < COLUMNS + 1; j++) {
+    occupied[i][j] = 0
+  }
+}
 
 drawGoBoard()
+goGoard.addEventListener('click', onClickGoBoard)
 
 /* === 工具函数 === */
 
@@ -50,4 +60,38 @@ function drawGoBoard(): void {
 
 function toLength(x: number): number {
   return GRID_SIZE * x + OFFSET
+}
+
+function oneStep(x: number, y: number, me: boolean): void {
+  ctx.beginPath()
+  ctx.arc(toLength(x), toLength(y), GRID_SIZE / 2, 0, 2 * Math.PI)
+  const gradient = ctx.createRadialGradient(
+    // 外圆
+    toLength(x) + 2, // 让亮光偏到右上角
+    toLength(y) - 2,
+    GRID_SIZE / 2,
+    // 内圆
+    toLength(x) + 2,
+    toLength(y) - 2,
+    GRID_SIZE / 2 / 8
+  )
+  if (me) {
+    gradient.addColorStop(0, '#0a0a0a')
+    gradient.addColorStop(1, '#636766')
+  } else {
+    gradient.addColorStop(0, '#d1d1d1')
+    gradient.addColorStop(1, '#f9f9f9')
+  }
+  ctx.fillStyle = gradient
+  ctx.fill()
+  ctx.closePath()
+}
+
+function onClickGoBoard(event: MouseEvent): void {
+  const x = Math.floor(event.offsetX / GRID_SIZE)
+  const y = Math.floor(event.offsetY / GRID_SIZE)
+  if (occupied[x][y]) return
+  oneStep(x, y, me)
+  occupied[x][y] = me ? 1 : 2
+  me = !me
 }
