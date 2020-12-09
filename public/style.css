@@ -8,14 +8,8 @@
 
 .container {
   margin: 10px;
-  padding: 10px;
+  padding: 8px;
   background-color: #dabb4f;
   display: inline-block;
   box-shadow: 5px 5px 10px 0 rgba(0, 0, 0, 0.6);
-}
-
-#canvas {
-  border: 1px solid black;
-  border-right: 0;
-  border-bottom: 0;
 }
