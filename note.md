@@ -340,6 +340,15 @@ for (let i = 0; i < LINES - 4; i++) {
 }
 ```
 
+## TODO
+
+- [ ] 总结计算机计算最优落点的过程
+
+## 来源
+
+- [JS 实现人机大战之五子棋（UI 篇）](https://www.imooc.com/learn/639)
+- [JS 实现人机大战之五子棋（AI 篇）](https://www.imooc.com/learn/644)
+
 ## 参考链接
 
 - [使用指南](https://www.babeljs.cn/docs/usage)
