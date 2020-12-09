@@ -38,55 +38,6 @@ yarn add @babel/preset-typescript -D
 }
 ```
 
-## 创建 public/index.html、public/style.css
-
-`public/index.html`
-
-```html
-<!DOCTYPE html>
-<html lang="zh-Hangs">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"
-    />
-    <title>五子棋</title>
-    <link rel="stylesheet" href="./style.css" />
-  </head>
-  <body>
-    <div class="container">
-      <canvas id="canvas"></canvas>
-    </div>
-
-    <script src="../dist/index.js"></script>
-  </body>
-</html>
-```
-
-`public/style.css`
-
-```css
-*,
-*::before,
-*::after {
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
-}
-
-.container {
-  margin: 10px;
-  padding: 10px;
-  background-color: #dabb4f;
-  display: inline-block;
-}
-
-#canvas {
-  border: 1px solid black;
-}
-```
-
 ## 使用 Canvas
 
 ```html
@@ -220,9 +171,9 @@ ctx.closePath()
 
 ```ts
 const BOARD_AREA_SIZE = 540
-const COLUMNS = 18
+const LINES = 19
 // 设置网格大小
-const GRID_SIZE = BOARD_AREA_SIZE / COLUMNS
+const GRID_SIZE = BOARD_AREA_SIZE / (LINES - 1)
 const OFFSET = GRID_SIZE / 2
 
 const goGoard = document.getElementById('canvas')! as HTMLCanvasElement
@@ -236,14 +187,14 @@ drawGoBoard()
 
 function drawGoBoard(): void {
   // 绘制 x、y 轴线
-  for (let i = 0; i < COLUMNS + 1; i++) {
+  for (let i = 0; i < LINES; i++) {
     ctx.beginPath()
     ctx.moveTo(OFFSET, toLength(i) - 0.5) // - 0.5 是为了解决像素模糊问题
     ctx.lineTo(BOARD_AREA_SIZE + OFFSET, toLength(i) - 0.5)
     ctx.stroke()
     ctx.closePath()
   }
-  for (let j = 0; j < COLUMNS + 1; j++) {
+  for (let j = 0; j < LINES; j++) {
     ctx.beginPath()
     ctx.moveTo(toLength(j) - 0.5, OFFSET)
     ctx.lineTo(toLength(j) - 0.5, BOARD_AREA_SIZE + OFFSET)
@@ -252,7 +203,7 @@ function drawGoBoard(): void {
   }
 
   // 绘制星元、天元
-  COLUMNS % 6 === 0 &&
+  ;(LINES - 1) % 6 === 0 &&
     [1 / 6, 1 / 2, 5 / 6].map(x => {
       ;[1 / 6, 1 / 2, 5 / 6].map(y => {
         ctx.beginPath()
@@ -277,7 +228,7 @@ function toLength(x: number): number {
 ## 画棋子
 
 ```ts
-function oneStep(x: number, y: number, me: boolean): void {
+function oneStep(x: number, y: number, user: boolean): void {
   ctx.beginPath()
   ctx.arc(toLength(x), toLength(y), GRID_SIZE / 2, 0, 2 * Math.PI)
   const gradient = ctx.createRadialGradient(
@@ -290,7 +241,7 @@ function oneStep(x: number, y: number, me: boolean): void {
     toLength(y) - 2,
     GRID_SIZE / 2 / 8
   )
-  if (me) {
+  if (user) {
     gradient.addColorStop(0, '#0a0a0a')
     gradient.addColorStop(1, '#636766')
   } else {
@@ -306,28 +257,86 @@ function oneStep(x: number, y: number, me: boolean): void {
 ## 用二维数组记录下过的地方
 
 ```ts
-let me: boolean = true
+let user: boolean = true
 const occupied: number[][] = []
-for (let i = 0; i < COLUMNS + 1; i++) {
+for (let i = 0; i < LINES; i++) {
   occupied[i] = []
-  for (let j = 0; j < COLUMNS + 1; j++) {
+  for (let j = 0; j < LINES; j++) {
     occupied[i][j] = 0
   }
 }
 
 // ...
 
-goGoard.addEventListener('click', onClickGoBoard)
+goGoard.addEventListener('click', onUserClick)
 
 // ...
 
-function onClickGoBoard(event: MouseEvent): void {
+function onUserClick(event: MouseEvent): void {
   const x = Math.floor(event.offsetX / GRID_SIZE)
   const y = Math.floor(event.offsetY / GRID_SIZE)
   if (occupied[x][y]) return
-  oneStep(x, y, me)
-  occupied[x][y] = me ? 1 : 2
-  me = !me
+  oneStep(x, y, user)
+  occupied[x][y] = user ? 1 : 2
+  user = !user
+}
+```
+
+## 用三维数组记录全部可以获得胜利的方法
+
+分四种：横线、竖线、左上到右下、右下到左上
+
+- 以 `wins[i][j][k]` 为例：
+  - `i` 代表横线
+  - `j` 代表竖线
+  - `k` 代表第几种赢法
+
+```ts
+// 获胜方法总数
+let waysToWin = 0
+// 获胜方法数组
+const wins: boolean[][][] = []
+for (let i = 0; i < LINES; i++) {
+  wins[i] = []
+  for (let j = 0; j < LINES; j++) {
+    wins[i][j] = []
+  }
+}
+// 横线获胜方法
+for (let i = 0; i < LINES; i++) {
+  for (let j = 0; j < LINES - 4; j++) {
+    for (let k = 0; k < 5; k++) {
+      wins[i][j + k][waysToWin] = true
+    }
+    waysToWin += 1
+  }
+}
+// 竖线获胜方法
+for (let i = 0; i < LINES - 4; i++) {
+  for (let j = 0; j < LINES; j++) {
+    for (let k = 0; k < 5; k++) {
+      wins[i + k][j][waysToWin] = true
+    }
+    waysToWin += 1
+  }
+}
+// 左上到右下获胜方法
+for (let i = 0; i < LINES - 4; i++) {
+  for (let j = 0; j < LINES - 4; j++) {
+    for (let k = 0; k < 5; k++) {
+      wins[j + k][i + k][waysToWin] = true
+    }
+    waysToWin += 1
+  }
+}
+// 右上到左下获胜方法
+for (let i = 0; i < LINES - 4; i++) {
+  for (let j = LINES - 1; j > 3; j--) {
+    for (let k = 0; k < 5; k++) {
+      wins[i + k][j - k][waysToWin] = true
+    }
+    waysToWin += 1
+  }
 }
 ```
 
