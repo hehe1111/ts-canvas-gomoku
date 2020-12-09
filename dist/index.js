@@ -156,7 +156,8 @@ function calculateWins() {
 }
 
 function onUserClick(event) {
-  if (over || !user) return;
+  if (over) return alert('本局已经结束，请刷新页面，新开棋局');
+  if (!user) return;
   var x = Math.floor(event.offsetX / GRID_SIZE);
   var y = Math.floor(event.offsetY / GRID_SIZE);
   if (occupied[x][y]) return;
@@ -281,10 +282,15 @@ function checkWin(_ref) {
       willLose[k] = 6; // 另一方永远不可能再以这种赢法获胜
 
       if (willWin[k] === 5) {
-        setTimeout(function () {
-          window.alert("".concat(isUser ? '你' : '计算机', "\u8D62\u4E86"));
-          over = true;
-        }, 0);
+        (function () {
+          var result = "\u672C\u5C40\u7ED3\u679C\uFF1A".concat(isUser ? '你' : '计算机', "\u8D62\u4E86");
+          var resultElement = document.getElementById('result');
+          resultElement.textContent = result;
+          setTimeout(function () {
+            window.alert(result);
+            over = true;
+          }, 0);
+        })();
       }
     }
   }

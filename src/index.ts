@@ -147,7 +147,8 @@ function calculateWins() {
 }
 
 function onUserClick(event: MouseEvent): void {
-  if (over || !user) return
+  if (over) return alert('本局已经结束，请刷新页面，新开棋局')
+  if (!user) return
 
   const x = Math.floor(event.offsetX / GRID_SIZE)
   const y = Math.floor(event.offsetY / GRID_SIZE)
@@ -252,8 +253,13 @@ function checkWin({ x, y, isUser }: { x: number; y: number; isUser: boolean }) {
       willWin[k] += 1
       willLose[k] = 6 // 另一方永远不可能再以这种赢法获胜
       if (willWin[k] === 5) {
+        const result = `本局结果：${isUser ? '你' : '计算机'}赢了`
+        const resultElement = document.getElementById(
+          'result'
+        ) as HTMLDivElement
+        resultElement.textContent = result
         setTimeout(() => {
-          window.alert(`${isUser ? '你' : '计算机'}赢了`)
+          window.alert(result)
           over = true
         }, 0)
       }

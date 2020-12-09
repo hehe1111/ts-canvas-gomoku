@@ -6,10 +6,19 @@
   box-sizing: border-box;
 }
 
+.page {
+  display: flex;
+  align-items: center;
+}
+
 .container {
   margin: 10px;
   padding: 10px;
   background-color: #dabb4f;
   display: inline-block;
   box-shadow: 5px 5px 10px 0 rgba(0, 0, 0, 0.6);
+}
+
+#result {
+  margin-left: 40px;
 }
