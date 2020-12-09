@@ -22,7 +22,7 @@ yarn add @babel/preset-typescript -D
 
 ```json
 {
-  "presets": ["@babel/preset-typescript"]
+  "presets": ["@babel/preset-env", "@babel/preset-typescript"]
 }
 ```
 
@@ -146,7 +146,7 @@ ctx.closePath()
       <canvas id="canvas"></canvas>
     </div>
 
-    <script src="../dist/index.js"></script>
+    <script src="./dist/index.js"></script>
   </body>
 </html>
 ```
